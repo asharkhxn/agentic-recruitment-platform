@@ -1,0 +1,17 @@
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+python-dotenv>=1.0.0
+supabase>=2.3.0
+pyjwt>=2.8.0
+cryptography>=41.0.0
+langchain>=0.1.0
+langgraph>=0.0.20
+langchain-groq>=0.0.1
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+httpx>=0.24.1
+pydantic>=2.8.0
+python-multipart>=0.0.6
+pypdf2>=3.0.1
+psycopg2-binary>=2.9.9
+sqlparse>=0.5.0
