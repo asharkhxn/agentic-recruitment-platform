@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, FileText, PoundSterling } from "lucide-react";
+import { ArrowLeft, FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/Label";
 import { Textarea } from "@/components/ui/Textarea";
 import { useJob } from "@/hooks/useJobs";
 import { useCreateApplication } from "@/hooks/useApplications";
-import { formatDate } from "@/utils/helpers";
+import { formatDate, parseSalary } from "@/utils/helpers";
 import { useAuth } from "@/hooks/useAuth";
 
 export const JobDetailPage = () => {
@@ -128,12 +128,21 @@ export const JobDetailPage = () => {
             <CardTitle className="text-3xl font-semibold leading-tight sm:text-4xl">
               {job.title}
             </CardTitle>
-            {job.salary && (
-              <div className="flex items-center gap-2 text-sm font-medium text-white/70">
-                <PoundSterling className="h-4 w-4 text-white/60" />
-                <span>{job.salary}</span>
-              </div>
-            )}
+            {job.salary &&
+              (() => {
+                const parsed = parseSalary(job.salary);
+                return (
+                  <div className="flex items-center gap-2 text-sm font-medium text-white/70">
+                    <span>
+                      {parsed.amount
+                        ? `${parsed.symbol ? parsed.symbol + " " : ""}${
+                            parsed.amount
+                          }`
+                        : parsed.amount}
+                    </span>
+                  </div>
+                );
+              })()}
           </CardHeader>
           <CardContent className="relative space-y-8 text-white/75">
             <section className="space-y-3">

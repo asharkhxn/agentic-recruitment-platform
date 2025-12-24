@@ -11,6 +11,7 @@ export const JobCreatePage = () => {
   const [description, setDescription] = useState("");
   const [requirements, setRequirements] = useState("");
   const [salary, setSalary] = useState("");
+  const [location, setLocation] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
@@ -27,12 +28,14 @@ export const JobCreatePage = () => {
         description,
         requirements,
         salary: salary || undefined,
+        location,
       });
 
       setTitle("");
       setDescription("");
       setRequirements("");
       setSalary("");
+      setLocation("");
       setSuccess(true);
     } catch (err: any) {
       setError(err.message || "Failed to create job");
@@ -108,6 +111,22 @@ export const JobCreatePage = () => {
                 value={requirements}
                 onChange={(event) => setRequirements(event.target.value)}
                 rows={4}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium text-white/70"
+                htmlFor="location"
+              >
+                Location
+              </label>
+              <Input
+                id="location"
+                placeholder="e.g. London, Remote, Hybrid"
+                value={location}
+                onChange={(event) => setLocation(event.target.value)}
                 required
               />
             </div>

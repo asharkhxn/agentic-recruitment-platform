@@ -1,6 +1,7 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { clearChatSession } from "@/lib/chatSession";
 import { Button } from "./ui/Button";
 import { cn } from "@/utils/helpers";
 
@@ -23,6 +24,7 @@ export const Navbar = () => {
     if (!user) return [];
     if (user.role === "recruiter") {
       return [
+        { label: "Dashboard", to: "/dashboard" },
         { label: "AI Assistant", to: "/chatbot" },
         { label: "ATS Ranking", to: "/ranking" },
         { label: "Create Role", to: "/jobs/create" },
@@ -37,6 +39,12 @@ export const Navbar = () => {
 
   const handleLogout = async () => {
     await logout();
+    // Clear any chat session data stored in the browser
+    try {
+      clearChatSession();
+    } catch (e) {
+      // ignore
+    }
     navigate("/");
   };
 

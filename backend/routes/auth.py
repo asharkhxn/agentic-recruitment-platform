@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
+import re
 
 from core.config import get_supabase_anon_client, get_supabase_client
 
@@ -7,13 +8,13 @@ router = APIRouter()
 
 
 class LoginRequest(BaseModel):
-    email: str
+    email: EmailStr
     password: str
 
 
 class SignupRequest(BaseModel):
-    email: str
-    password: str
+    email: EmailStr
+    password: str 
     first_name: str = Field(..., min_length=1)
     last_name: str = Field(..., min_length=1)
     role: str  # 'applicant' or 'recruiter'
@@ -33,6 +34,7 @@ async def login(request: LoginRequest):
             "email": request.email,
             "password": request.password
         })
+
         
         service_client = get_supabase_client()
         user_record = service_client.table("users").select("*").eq("id", response.user.id).execute()
@@ -66,6 +68,20 @@ async def login(request: LoginRequest):
 async def signup(request: SignupRequest):
     """Sign up with email, password and role."""
     try:
+        # Enhanced password validation: at least 8 chars, upper, lower, digit, special char
+        pwd = request.password
+        if (
+            len(pwd) < 8
+            or not re.search(r"[A-Z]", pwd)
+            or not re.search(r"[a-z]", pwd)
+            or not re.search(r"[0-9]", pwd)
+            or not re.search(r"[^A-Za-z0-9]", pwd)
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail="Password must be at least 8 characters and include upper, lower, numeric, and special characters."
+            )
+
         if request.role not in {"applicant", "recruiter"}:
             raise HTTPException(status_code=400, detail="Role must be either 'applicant' or 'recruiter'")
 

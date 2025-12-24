@@ -1,11 +1,23 @@
+
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from typing import List, Optional
 from core.config import get_supabase_client
 from core.models import Application
 from core.auth import verify_jwt, User
 import uuid
+import os
 
 router = APIRouter()
+
+@router.get("/count/{job_id}")
+async def get_application_count(job_id: str, user: User = Depends(verify_jwt)):
+    """Get the number of applications for a job (recruiter or applicant)."""
+    try:
+        supabase = get_supabase_client()
+        response = supabase.table("applications").select("id", count="exact").eq("job_id", job_id).execute()
+        return {"count": response.count or 0}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("", response_model=List[Application])
@@ -63,6 +75,14 @@ async def create_application(
         if user.role != "applicant":
             raise HTTPException(status_code=403, detail="Only applicants can apply")
 
+        # Minimal normalization (trim strings)
+        cover_letter = str(cover_letter).strip() if cover_letter else None
+        motivation = str(motivation).strip()
+        proud_project = str(proud_project).strip()
+
+        # Simple filename normalization (strip any path components)
+        file_name = os.path.basename(cv_file.filename)
+
         # Check if job exists
         supabase = get_supabase_client()
         job = supabase.table("jobs").select("id", "created_by").eq("id", job_id).single().execute()
@@ -71,21 +91,25 @@ async def create_application(
         recruiter_id = job.data.get("created_by")
         if not recruiter_id:
             raise HTTPException(status_code=400, detail="Job is missing recruiter information")
-        
+
         # Upload CV to Supabase Storage
         file_extension = cv_file.filename.split(".")[-1]
         file_name = f"{user.id}/{job_id}/{uuid.uuid4()}.{file_extension}"
-        
+
         file_bytes = await cv_file.read()
+        # Basic size check (10MB max)
+        if len(file_bytes) > 10 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="File too large")
+
         storage_response = supabase.storage.from_("cv-uploads").upload(
             file_name,
             file_bytes,
             {"content-type": cv_file.content_type}
         )
-        
+
         # Get public URL
         cv_url = supabase.storage.from_("cv-uploads").get_public_url(file_name)
-        
+
         # Create application record
         applicant_name = user.full_name or user.email
         response = supabase.table("applications").insert({
@@ -98,8 +122,10 @@ async def create_application(
             "motivation": motivation,
             "proud_project": proud_project
         }).execute()
-        
+
         return response.data[0]
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid input: {str(e)}")
     except HTTPException:
         raise
     except Exception as e:

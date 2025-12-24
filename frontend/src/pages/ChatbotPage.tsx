@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getChatMessages, persistChatMessages } from "@/lib/chatSession";
 import { agentApi } from "@/api/agent";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -18,8 +19,13 @@ export const ChatbotPage = () => {
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string>();
 
+  // Load messages from sessionStorage on mount
   useEffect(() => {
     document.title = "AI Chatbot - Recruitment System";
+    const stored = getChatMessages();
+    if (stored && Array.isArray(stored)) {
+      setMessages(stored as any);
+    }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,25 +34,36 @@ export const ChatbotPage = () => {
     await sendPrompt(input);
   };
 
+  // Helper to persist messages in sessionStorage
+  const persistMessages = (msgs: Message[]) => {
+    persistChatMessages(msgs);
+  };
+
+  // chat session clearing is handled by shared helper in /lib/chatSession
+
   const sendPrompt = async (messageToSend: string) => {
     if (!messageToSend.trim()) return;
 
     // Get user from localStorage
     const userStr = localStorage.getItem("user");
     if (!userStr) {
-      setMessages((prev) => [
-        ...prev,
+      const newMsgs: Message[] = [
+        ...messages,
         {
           role: "assistant",
           content: "Error: Please login to use the chatbot",
         },
-      ]);
+      ];
+      setMessages(newMsgs);
+      persistMessages(newMsgs);
       return;
     }
     const user = JSON.parse(userStr);
 
     const userMessage: Message = { role: "user", content: messageToSend };
-    setMessages((prev) => [...prev, userMessage]);
+    const newMsgs: Message[] = [...messages, userMessage];
+    setMessages(newMsgs);
+    persistMessages(newMsgs);
     setInput("");
     setLoading(true);
 
@@ -58,19 +75,23 @@ export const ChatbotPage = () => {
       });
 
       setConversationId(response.conversation_id);
-      setMessages((prev) => [
-        ...prev,
+      const updatedMsgs: Message[] = [
+        ...newMsgs,
         {
           role: "assistant",
           content: response.response,
           sql: response.sql_generated,
         },
-      ]);
+      ];
+      setMessages(updatedMsgs);
+      persistMessages(updatedMsgs);
     } catch (error: any) {
-      setMessages((prev) => [
-        ...prev,
+      const errorMsgs: Message[] = [
+        ...newMsgs,
         { role: "assistant", content: `Error: ${error.message}` },
-      ]);
+      ];
+      setMessages(errorMsgs);
+      persistMessages(errorMsgs);
     } finally {
       setLoading(false);
     }
@@ -78,25 +99,20 @@ export const ChatbotPage = () => {
 
   const quickPrompts: { label: string; prompt: string }[] = [
     {
-      label: "Create job (example)",
+      label: "Draft outreach message",
       prompt:
-        "Create a job for Senior Backend Engineer in London, requirements: Python, FastAPI, PostgreSQL, salary: £80k-£100k",
+        "Draft a concise (2-3 sentence) outreach message for a Senior Backend Engineer role that highlights company culture and includes a clear next step to apply.",
     },
     {
-      label: "Summarize a job",
-      prompt: 'Summarize the job "Senior Backend Engineer" in 2-3 sentences',
+      label: "Suggest interview questions",
+      prompt:
+        "Suggest 8 interview questions to assess a Senior Backend Engineer with emphasis on system design, scalability, and testing. Include a short ideal-answer guidance for each.",
     },
     { label: "Find jobs in London", prompt: "Find jobs in London" },
     { label: "Find jobs 100k+", prompt: "Find jobs with salary above 100k" },
-    {
-      label: "View applicants",
-      prompt: "Show applicants for job_id: <paste-job-id-here>",
-    },
-    {
-      label: "Rank applicants",
-      prompt: "Rank applicants for job_id: <paste-job-id-here>",
-    },
   ];
+
+  // No special quick-prompt follow-up flows; buttons send their prompt directly.
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-24">

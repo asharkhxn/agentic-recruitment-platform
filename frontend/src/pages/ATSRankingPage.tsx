@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { atsApi } from "@/api/ats";
 import { filesApi } from "@/api/files";
-import { useJobs } from "@/hooks/useJobs";
+import { useAuth } from "@/hooks/useAuth";
+import { jobsApi } from "@/api/jobs";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
@@ -11,7 +12,23 @@ import { Trophy, Mail, FileText, X, Download } from "lucide-react";
 import { AxiosError } from "axios";
 
 export const ATSRankingPage = () => {
-  const { data: jobs } = useJobs();
+  const { user } = useAuth();
+  const [jobs, setJobs] = useState<any[] | undefined>(undefined);
+
+  useEffect(() => {
+    // fetch only the jobs for the logged-in recruiter
+    const load = async () => {
+      if (!user) return;
+      try {
+        const result = await jobsApi.getJobsByRecruiter(user.id);
+        setJobs(result);
+      } catch (err) {
+        // fall back to empty list on error
+        setJobs([]);
+      }
+    };
+    load();
+  }, [user]);
   const [selectedJobId, setSelectedJobId] = useState<string>("");
   const [rankedApplicants, setRankedApplicants] = useState<RankedApplicant[]>(
     []

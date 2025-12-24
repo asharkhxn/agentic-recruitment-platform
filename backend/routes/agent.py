@@ -21,8 +21,7 @@ async def chat(message: ChatMessage):
         
         return ChatResponse(
             response=result["response"],
-            conversation_id=conversation_id,
-            sql_generated=result.get("sql_generated")
+            conversation_id=conversation_id
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -20,6 +20,7 @@ export interface JobCreate {
   description: string;
   requirements: string;
   salary?: string;
+  location: string;
 }
 
 export interface Application {

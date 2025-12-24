@@ -87,7 +87,8 @@
 
 @layer components {
   .glass-panel {
-    @apply rounded-[28px] border border-white/10 bg-white/5 backdrop-blur-2xl shadow-[0_35px_80px_rgba(11,10,28,0.45)];
+    /* Use a solid, high-contrast card background for readability instead of heavy glass blur */
+    @apply rounded-[28px] border border-white/10 bg-[#071127] text-white shadow-[0_20px_40px_rgba(0,0,0,0.6)];
   }
 
   .accent-pill {

@@ -1,12 +1,17 @@
-import { api } from '@/lib/api';
-import { Application } from '@/types';
+import { api } from "@/lib/api";
+import { Application } from "@/types";
 
 export const applicationsApi = {
   getAll: async (jobId?: string): Promise<Application[]> => {
-    const response = await api.get('/applications', {
+    const response = await api.get("/applications", {
       params: jobId ? { job_id: jobId } : {},
     });
     return response.data;
+  },
+
+  getApplicationCount: async (jobId: string): Promise<number> => {
+    const response = await api.get(`/applications/count/${jobId}`);
+    return response.data.count;
   },
 
   getById: async (id: string): Promise<Application> => {
@@ -15,9 +20,9 @@ export const applicationsApi = {
   },
 
   create: async (formData: FormData): Promise<Application> => {
-    const response = await api.post('/applications', formData, {
+    const response = await api.post("/applications", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
     return response.data;

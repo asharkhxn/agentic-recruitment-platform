@@ -1,3 +1,4 @@
+import { RecruiterDashboard } from "./pages/RecruiterDashboard";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -40,10 +41,15 @@ function App() {
               <Route element={<ProtectedRoute allowedRoles={["applicant"]} />}>
                 <Route path="/jobs" element={<JobListingsPage />} />
                 <Route path="/jobs/:jobId" element={<JobDetailPage />} />
+              </Route>
+
+              {/* Applications should be accessible to any authenticated user (applicant or recruiter) */}
+              <Route element={<ProtectedRoute />}>
                 <Route path="/applications" element={<ApplicationsPage />} />
               </Route>
 
               <Route element={<ProtectedRoute allowedRoles={["recruiter"]} />}>
+                <Route path="/dashboard" element={<RecruiterDashboard />} />
                 <Route path="/chatbot" element={<ChatbotPage />} />
                 <Route path="/ranking" element={<ATSRankingPage />} />
                 <Route path="/jobs/create" element={<JobCreatePage />} />
