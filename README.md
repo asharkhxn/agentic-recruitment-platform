@@ -56,3 +56,10 @@ A simple full-stack recruitment app for hiring managers. Features authentication
      npm run dev
      ```
 5. Open your browser at `http://localhost:3000` (frontend) and `http://localhost:8000/docs` (backend API docs).
+
+## Demo Video
+
+A short walkthrough video demonstrating the recruiter and applicant flows,
+including job creation, application submission, agentic ATS ranking and the agentic AI assistant:
+
+- Demo: https://drive.google.com/file/d/1qvRXG2Oz8CgfezZ5L8PYjKbwNp5wRMkm/view?usp=sharing
