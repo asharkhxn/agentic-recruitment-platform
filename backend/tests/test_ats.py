@@ -19,7 +19,7 @@ def test_rank_endpoint():
 
     app.dependency_overrides[verify_recruiter] = recruiter_override
     try:
-        with patch("agent.tools.rank_applicants_for_job", new_callable=AsyncMock) as mock_rank:
+        with patch("agent.tools.applicant_tools.rank_applicants_for_job", new_callable=AsyncMock) as mock_rank:
             mock_rank.return_value = MagicMock(
                 job_id="job1",
                 job_title="Software Engineer",

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from core.models import ATSRankingRequest, ATSRankingResponse
 from core.auth import verify_recruiter, User
 from core.config import get_supabase_client
-from agent.tools import rank_applicants_for_job
+from agent.tools.applicant_tools import rank_applicants_for_job
 
 router = APIRouter()
 

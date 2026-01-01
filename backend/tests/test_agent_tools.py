@@ -1,18 +1,14 @@
 import pytest
 from unittest.mock import patch, MagicMock, AsyncMock
-from agent.tools import (
-    create_job,
-    get_applicants,
-    summarize_cv,
-    generate_job_description,
-    rank_applicants_for_job
-)
+from agent.tools.job_tools import create_job
+from agent.tools.applicant_tools import get_applicants, rank_applicants_for_job
+from agent.tools.content_tools import summarize_cv, generate_job_description
 
 
 @pytest.mark.asyncio
 async def test_create_job():
     """Test create_job tool."""
-    with patch("agent.tools.get_supabase_client") as mock_supabase:
+    with patch("agent.tools.job_tools.get_supabase_client") as mock_supabase:
         mock_response = MagicMock()
         mock_response.data = [{
             "id": "job1",
@@ -41,7 +37,7 @@ async def test_create_job():
 @pytest.mark.asyncio
 async def test_get_applicants():
     """Test get_applicants tool."""
-    with patch("agent.tools.get_supabase_client") as mock_supabase:
+    with patch("agent.tools.applicant_tools.get_supabase_client") as mock_supabase:
         mock_response = MagicMock()
         mock_response.data = [
             {
@@ -63,7 +59,7 @@ async def test_get_applicants():
 @pytest.mark.asyncio
 async def test_get_applicants_filtered():
     """Test get_applicants tool with job filter."""
-    with patch("agent.tools.get_supabase_client") as mock_supabase:
+    with patch("agent.tools.applicant_tools.get_supabase_client") as mock_supabase:
         mock_response = MagicMock()
         mock_response.data = [
             {
@@ -84,7 +80,7 @@ async def test_get_applicants_filtered():
 @pytest.mark.asyncio
 async def test_summarize_cv():
     """Test CV summarization."""
-    with patch("agent.tools.llm") as mock_llm:
+    with patch("agent.tools.content_tools.llm") as mock_llm:
         mock_response = MagicMock()
         mock_response.content = "Experienced developer with 5 years in Python and AI."
         mock_llm.invoke.return_value = mock_response
@@ -98,7 +94,7 @@ async def test_summarize_cv():
 @pytest.mark.asyncio
 async def test_generate_job_description():
     """Test job description generation."""
-    with patch("agent.tools.llm") as mock_llm:
+    with patch("agent.tools.content_tools.llm") as mock_llm:
         mock_response = MagicMock()
         mock_response.content = "We are seeking a talented Backend Developer..."
         mock_llm.invoke.return_value = mock_response
@@ -115,8 +111,8 @@ async def test_generate_job_description():
 @pytest.mark.asyncio
 async def test_rank_applicants_for_job():
     """Test ATS ranking functionality."""
-    with patch("agent.tools.get_supabase_client") as mock_supabase, \
-         patch("agent.tools.llm") as mock_llm:
+    with patch("agent.tools.applicant_tools.get_supabase_client") as mock_supabase, \
+         patch("agent.tools.applicant_tools.llm") as mock_llm:
         
         # Mock job data
         mock_job_response = MagicMock()

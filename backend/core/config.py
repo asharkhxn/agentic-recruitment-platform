@@ -14,6 +14,10 @@ class Config:
     SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
     JWT_SECRET = os.getenv("JWT_SECRET")
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+    # LangSmith configuration
+    LANGSMITH_API_KEY = os.getenv("LANGSMITH_API_KEY")
+    LANGSMITH_PROJECT = os.getenv("LANGSMITH_PROJECT", "recruitment-agent")
+    LANGSMITH_TRACING_V2 = os.getenv("LANGSMITH_TRACING_V2", "true")
 
 
 def get_supabase_client() -> Client:

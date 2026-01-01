@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from core.models import ChatMessage, ChatResponse
-from agent.graph import run_agent
+from agent.orchestration import run_agent
 import uuid
 
 router = APIRouter()

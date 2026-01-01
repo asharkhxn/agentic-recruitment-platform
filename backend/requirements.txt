@@ -7,6 +7,7 @@ cryptography>=41.0.0
 langchain>=0.1.0
 langgraph>=0.0.20
 langchain-groq>=0.0.1
+langsmith>=0.1.0
 pytest>=7.4.0
 pytest-asyncio>=0.21.0
 httpx>=0.24.1
