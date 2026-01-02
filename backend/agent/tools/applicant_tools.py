@@ -2,6 +2,7 @@ from typing import Dict, List, Any
 from core.config import get_supabase_client
 from core.models import RankedApplicant, ATSRankingResponse
 from agent.utils.llm import llm
+from agent.utils.cv_parser import download_and_extract_cv_text
 import json
 import re
 
@@ -53,9 +54,26 @@ async def rank_applicants_for_job(job_id: str) -> ATSRankingResponse:
         ranked_applicants = []
         
         for app in applications:
-            # Extract CV text (simplified - in production, parse PDF)
-            cv_text = f"CV URL: {app['cv_url']}"
+            # Extract actual CV text from PDF
+            cv_url = app.get('cv_url', '')
+            try:
+                cv_text = await download_and_extract_cv_text(cv_url)
+            except Exception as e:
+                cv_text = f"Could not extract CV text: {str(e)}"
+            
             cover_letter = app.get("cover_letter", "")
+            
+            # Include additional application fields if available
+            motivation = app.get("motivation", "")
+            proud_project = app.get("proud_project", "")
+            
+            # Combine all applicant content for better analysis
+            applicant_content = cv_text
+            if motivation:
+                applicant_content += f"\n\nMotivation/Why This Role:\n{motivation}"
+            if proud_project:
+                applicant_content += f"\n\nProud Project/Achievement:\n{proud_project}"
+            
             application_id = app.get("id") or app.get("application_id") or app.get("applicant_id")
             application_id = str(application_id)
 
@@ -74,7 +92,7 @@ async def rank_applicants_for_job(job_id: str) -> ATSRankingResponse:
                 job_title=job['title'],
                 job_requirements=job['requirements'],
                 job_description=job['description'],
-                cv_text=cv_text,
+                cv_text=applicant_content,  # Now includes CV text + motivation + proud project
                 cover_letter=cover_letter
             )
             

@@ -5,6 +5,23 @@ from core.config import get_supabase_client
 SESSION_STORE: dict[str, list[dict]] = {}
 # Short summaries cache per session
 SESSION_SUMMARIES: dict[str, str] = {}
+# Pending job details awaiting confirmation (session_id -> job dict)
+PENDING_JOBS: dict[str, dict] = {}
+
+
+def store_pending_job(session_id: str, job_details: dict):
+    """Store pending job details for a session awaiting confirmation."""
+    PENDING_JOBS[session_id] = job_details
+
+
+def get_pending_job(session_id: str) -> dict | None:
+    """Retrieve pending job details for a session."""
+    return PENDING_JOBS.get(session_id)
+
+
+def clear_pending_job(session_id: str):
+    """Clear pending job details after creation or cancellation."""
+    PENDING_JOBS.pop(session_id, None)
 
 
 def persist_chat_message(session_id: str, user_id: str, role: str, content: str):
@@ -64,12 +81,19 @@ def summarize_messages_if_needed(session_id: str, messages: list[dict], threshol
 
 def get_last_intent(session_id: str) -> str | None:
     """Get the last intent/routing decision from conversation history."""
+    # First, check if there's a pending job - if so, route to create_job_tool
+    if session_id in PENDING_JOBS:
+        return "create_job_tool"
+    
     try:
         messages = load_recent_messages(session_id, limit=5)
         # Look for assistant messages that indicate what action was taken
         for msg in reversed(messages):
             if msg.get("role") == "assistant":
                 content = msg.get("content", "").lower()
+                # Check for pending job creation (asking for missing info)
+                if "need a few details" in content or "before i can post" in content:
+                    return "create_job_tool"
                 # Try to infer intent from response patterns
                 if "job created" in content or "create" in content:
                     return "create_job_tool"

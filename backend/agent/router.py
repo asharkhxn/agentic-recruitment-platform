@@ -42,12 +42,29 @@ def route_query(state: AgentState) -> str:
     # JOB CREATION - Comprehensive phrase matching (PRIORITY: Check before search)
     # Expanded list to catch all variations
     create_job_phrases = [
+        # Direct job creation
         "create a job", "create job", "post a job", "post job",
-        "post a new job", "post new job",  # Added variations
+        "post a new job", "post new job",
         "new job posting", "add a job", "add job posting",
-        "create job for", "post job for",  # Added "for" variations
-        "i want to create", "i need to post", "i'd like to add",  # Natural language
-        "we're hiring", "we need to post", "we want to create"  # Team language
+        "create job for", "post job for",
+        # Role-based phrases
+        "create a role", "create role", "post a role", "post role",
+        "add a role", "add role",
+        # Natural language
+        "i want to create", "i need to post", "i'd like to add",
+        "we're hiring", "we need to post", "we want to create",
+        "create a new one", "another job", "new role",
+        # Please variations
+        "please post", "please create",
+        # With article variations
+        "post an", "create an",
+        # Role patterns (with common job titles)
+        "coordinator role", "technician role", "developer role",
+        "engineer role", "manager role", "analyst role", "specialist role",
+        # Position patterns
+        "position in", "position for", "role in", "role for",
+        # Hiring patterns
+        "hiring for", "hiring a", "looking to hire",
     ]
     
     # Check if message contains any job creation phrase

@@ -11,9 +11,9 @@ if Config.LANGSMITH_API_KEY:
     os.environ["LANGCHAIN_ENDPOINT"] = "https://api.smith.langchain.com"
     os.environ["LANGCHAIN_API_KEY"] = Config.LANGSMITH_API_KEY
     os.environ["LANGCHAIN_PROJECT"] = Config.LANGSMITH_PROJECT
-    print(f"✅ LangSmith observability enabled for project: {Config.LANGSMITH_PROJECT}")
+    print(f"LangSmith observability enabled for project: {Config.LANGSMITH_PROJECT}")
 else:
-    print("⚠️  LangSmith API key not found. Observability disabled.")
+    print("LangSmith API key not found. Observability disabled.")
 
 app = FastAPI(title="Recruitment System API", version="1.0.0")
 
