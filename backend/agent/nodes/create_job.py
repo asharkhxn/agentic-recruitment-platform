@@ -14,8 +14,7 @@ from agent.utils.session import (
     clear_pending_job,
 )
 
-REQUIRED_FIELDS = ("title", "location")
-DISPLAY_FIELDS = ("title", "location", "salary", "description", "requirements")
+REQUIRED_FIELDS = ("title", "location", "description", "requirements")
 DEFAULT_REQUIREMENTS = "3+ years of relevant experience and strong communication skills."
 INTENT_KEYWORDS = (
     # Direct job creation phrases
@@ -173,12 +172,13 @@ def _missing_fields_response(job: Dict[str, Optional[str]], missing: list[str]) 
         "description": "Share a 1-2 sentence summary of the role's responsibilities.",
         "requirements": "List key requirements (experience, skills, certifications).",
         "location": "Where is the role based (city/country or Remote)?",
+        "salary": "What is the salary range (e.g., '$70,000 - $90,000')?",
     }
     lines = ["I still need a few details before I can post the job:"]
     for field in missing:
         guidance = prompts.get(field, "Please provide this detail.")
         lines.append(f"• {field.capitalize()}: {guidance}")
-    lines.append("Please reply with the missing info in one message.")
+    lines.append("Please reply with the missing info to create a job posting.")
     return "\n".join(lines)
 
 

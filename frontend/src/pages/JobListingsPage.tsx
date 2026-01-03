@@ -94,18 +94,6 @@ export const JobListingsPage = () => {
                   </button>
                 )}
               </div>
-              <div className="flex gap-3">
-                <Link to="/chatbot">
-                  <Button variant="ghost" size="sm" className="px-5">
-                    Ask the AI assistant
-                  </Button>
-                </Link>
-                <Link to="/signup">
-                  <Button size="sm" className="px-5">
-                    Join the platform
-                  </Button>
-                </Link>
-              </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
